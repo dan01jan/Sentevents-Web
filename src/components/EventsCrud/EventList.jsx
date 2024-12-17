@@ -23,10 +23,36 @@ const EventList = () => {
     fetchEvents();
   }, []);
 
-  const handleDelete = (id) => {
-    // Implement delete functionality
-    console.log(`Delete event with id: ${id}`);
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/v1/events/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          // Include any authentication headers if required
+          // 'Authorization': `Bearer ${yourAuthToken}`
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete event');
+      }
+  
+      const data = await response.json();
+      console.log(data.message); // Should log "Event deleted successfully"
+  
+      // Handle successful deletion (e.g., remove event from state, show success message)
+      // For example:
+      // setEvents(prevEvents => prevEvents.filter(event => event._id !== id));
+      // showSuccessMessage('Event deleted successfully');
+  
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      // Handle error (e.g., show error message to user)
+      // showErrorMessage('Failed to delete event. Please try again.');
+    }
   };
+  
 
   const handleEdit = (id) => {
     // Implement edit functionality

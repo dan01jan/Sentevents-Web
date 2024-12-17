@@ -101,7 +101,7 @@ const Navbar = () => {
               </div>
             ) : (
               <>
-                <span className="text-gray-600 dark:text-gray-200 truncate max-w-[150px]">FUCK LIFE</span>
+                <span className="text-gray-600 dark:text-gray-200 truncate max-w-[150px]">WELCOME</span>
                 <Link 
                   to="/login" 
                   className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark focus:outline-none duration-200"

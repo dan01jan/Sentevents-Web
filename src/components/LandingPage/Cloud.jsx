@@ -18,7 +18,7 @@ const Cloud = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/v1/events/');
+        const response = await axios.get('http://localhost:4000/api/v1/events');
         const eventNames = response.data.map((event) => ({
           text: event.name,
           value: Math.floor(Math.random() * 100) + 10,
