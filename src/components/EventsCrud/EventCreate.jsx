@@ -20,23 +20,53 @@ const EventCreate = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedUserName = localStorage.getItem('userName');
     const storedOrganization = localStorage.getItem('organization');
 
-    if (storedUser) {
-      setEventData(prevData => ({
-        ...prevData,
-        userName: storedUser.name || '',
-      }));
-    }
+    setEventData(prevData => ({
+      ...prevData,
+      userName: storedUserName || '',
+      organization: storedOrganization || '',
+    }));
 
-    if (storedOrganization) {
-      setEventData(prevData => ({
-        ...prevData,
-        organization: storedOrganization,
-      }));
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      fetchOrganization(userId);
     }
   }, []);
+
+  // Fetch organization based on userId
+  const fetchOrganization = async (userId) => {
+    try {
+      const token = localStorage.getItem('authToken'); // Retrieve the token from localStorage
+      
+      if (!token) {
+        alert('User is not authenticated. Please log in.');
+        return;
+      }
+  
+      const response = await axios.get(`http://localhost:4000/api/v1/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Send token in Authorization header
+        },
+      });
+  
+      const organization = response.data.organization || '';
+      localStorage.setItem('organization', organization); // Store the organization in localStorage
+      setEventData((prevData) => ({
+        ...prevData,
+        organization: organization,
+      }));
+    } catch (error) {
+      console.error('Error fetching organization:', error.response?.data || error.message);
+      alert('An error occurred while fetching the organization.');
+    }
+  };
+  
+  
+  console.log("org", localStorage)
+
+  console.log(localStorage);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

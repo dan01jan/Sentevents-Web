@@ -106,6 +106,7 @@ const UpdateProfile = () => {
         name,
         email,
         course,
+        organization,
         other,
         password,
       };
