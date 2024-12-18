@@ -39,8 +39,10 @@ const EventUpdate = () => {
     try {
       const formData = new FormData();
       formData.append('name', event.name);
-      formData.append('dateStart', `${event.dateStart}T${event.timeStart}`);
-      formData.append('dateEnd', `${event.dateEnd}T${event.timeEnd}`);
+      formData.append('dateStart', `${event.dateStart}`);
+      formData.append('timeStart', `${event.timeStart}`);
+      formData.append('dateEnd', `${event.dateEnd}`);
+      formData.append('timeEnd', `${event.timeEnd}`);
       formData.append('location', event.location);
       formData.append('description', event.description);
       formData.append('organization', event.organization);
