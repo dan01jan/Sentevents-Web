@@ -12,6 +12,7 @@ import EventList from './components/EventsCrud/EventList';
 import UpdateProfile from './components/LandingPage/UpdateProfile';
 import EventCreate from './components/EventsCrud/EventCreate';
 import EventUpdate from './components/EventsCrud/EventUpdate';
+import EventDetails from './components/EventsCrud/EventsDetails';
 
 
 function App() {
@@ -41,6 +42,8 @@ function App() {
         <Route path="/eventslist" element={<EventList />} />
         <Route path="/eventscreate" element={<EventCreate />} />
         <Route path="/eventsupdate/:id" element={<EventUpdate />} />
+        <Route path="/eventsdetails/:id" element={<EventDetails />} />
+
       </Routes>
     </Router>
   );
