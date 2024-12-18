@@ -5,6 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css"; // Core styles
 import "swiper/css/navigation"; // Optional navigation styles
 import "swiper/css/pagination"; // Optional pagination styles
+import EventModal from './EventModal'; // Import the EventModal component
 
 // Function to format time from ISO string to 12-hour format with AM/PM
 const formatTime = (timeStr) => {
@@ -28,6 +29,10 @@ const EventsDetails = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [rating, setRating] = useState(0); // Rating state
+  const [isEventEnded, setIsEventEnded] = useState(false); // Check if the event has ended
+  const [showModal, setShowModal] = useState(false); // State to control modal visibility
+  const userId = 456; // Example user ID, ideally this would come from the user session or authentication context
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -37,6 +42,11 @@ const EventsDetails = () => {
         );
         setEvent(response.data.event);
         setLoading(false);
+
+        // Check if the event has ended
+        const eventEndTime = new Date(response.data.event.dateEnd);
+        const currentTime = new Date();
+        setIsEventEnded(currentTime > eventEndTime); // Set event ended status
       } catch (err) {
         console.error("Error fetching event details:", err);
         setError("Failed to load event details.");
@@ -46,6 +56,20 @@ const EventsDetails = () => {
 
     fetchEventDetails();
   }, [id]);
+
+  const handleRatingChange = (value) => {
+    setRating(value);
+  };
+
+  const handleButtonClick = () => {
+    if (isEventEnded) {
+      setShowModal(true); // Show the modal when the event has ended
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false); // Close the modal
+  };
 
   if (loading) {
     return <p>Loading event details...</p>;
@@ -76,6 +100,23 @@ const EventsDetails = () => {
           </Swiper>
         </div>
         <div>
+          {/* Star Rating */}
+          <div className="flex mb-4">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <svg
+                key={star}
+                xmlns="http://www.w3.org/2000/svg"
+                fill={star <= rating ? "yellow" : "gray"}
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className="w-6 h-6 cursor-pointer"
+                onClick={() => handleRatingChange(star)}
+              >
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+              </svg>
+            ))}
+          </div>
+          
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
             {event.name}
           </h2>
@@ -99,8 +140,31 @@ const EventsDetails = () => {
           </div>
         </div>
       </div>
-       {/* Comment Section */}
-       <div className="p-8 bg-gray-100 mt-8 rounded-lg">
+
+      {/* Button that is only clickable if the event has ended */}
+      <div className="p-8">
+        <button
+          onClick={handleButtonClick}
+          disabled={!isEventEnded}
+          className={`${
+            isEventEnded ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-400 cursor-not-allowed"
+          } text-white px-6 py-2 rounded-lg transition duration-300`}
+        >
+          Go to Event Modal
+        </button>
+      </div>
+
+      {/* Event Modal */}
+      {showModal && (
+        <EventModal
+          eventId={id}
+          userId={userId}
+          onClose={closeModal}
+        />
+      )}
+      
+      {/* Comment Section */}
+      <div className="p-8 bg-gray-100 mt-8 rounded-lg">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">
           Leave a Comment
         </h3>

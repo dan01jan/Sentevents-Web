@@ -1,165 +1,3 @@
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79
-80
-81
-82
-83
-84
-85
-86
-87
-88
-89
-90
-91
-92
-93
-94
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114
-115
-116
-117
-118
-119
-120
-121
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131
-132
-133
-134
-135
-136
-137
-138
-139
-140
-141
-142
-143
-144
-145
-146
-147
-148
-149
-150
-151
-152
-153
-154
-155
-156
-157
-158
-159
-160
-161
-// Home.js
 import React from 'react';
 import weblogo from '../../assets/website/weblogo.png';
 import { useState, useEffect } from 'react';
@@ -174,7 +12,7 @@ const Home = () => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get('http://localhost:4000/api/v1/events');
-        setEvents(response.data.data.slice(0, 3)); // Get only the first 3 events
+        setEvents(response.data.data); // Set all events
       } catch (error) {
         console.error('Error fetching events:', error);
       }
@@ -218,7 +56,23 @@ const Home = () => {
         <div className="container mx-auto">
           <h2 className="text-4xl font-bold mb-8">Recent Events</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {events.map((event) => (
+            {events.slice(0, 3).map((event) => ( // Display only the first 3 events
+              <EventCard 
+                key={event._id} 
+                event={event} 
+                onClick={() => handleEventClick(event._id)} 
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* All Events Section */}
+      <section className="py-16 px-8 bg-gray-200 dark:bg-gray-800">
+        <div className="container mx-auto">
+          <h2 className="text-4xl font-bold mb-8">All Events</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {events.map((event) => ( // Display all events
               <EventCard 
                 key={event._id} 
                 event={event} 
@@ -241,6 +95,9 @@ const Home = () => {
 
 const EventCard = ({ event, onClick }) => {
   const imageUrl = event.images?.[0]?.url || event.images?.[0] || "https://via.placeholder.com/150";
+  
+  // Static rating value (use event.rating if available)
+  const staticRating = event.rating || 3; // Example: default to 3 stars if no rating available
 
   return (
     <div 
@@ -255,6 +112,22 @@ const EventCard = ({ event, onClick }) => {
       />
       <h3 className="text-2xl font-semibold">{event.name}</h3>
       <p className="mt-2">{event.description}</p>
+
+      {/* Static Star Rating under Description */}
+      <div className="mt-4 flex">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <svg
+            key={star}
+            xmlns="http://www.w3.org/2000/svg"
+            fill={star <= staticRating ? "yellow" : "gray"}
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+          </svg>
+        ))}
+      </div>
     </div>
   );
 };
