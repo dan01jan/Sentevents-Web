@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { gapi } from 'gapi-script'; // Import the Google API library
+import { gapi } from 'gapi-script';
 import Navbar from './components/Navbar/Navbar';
 import Home from './components/LandingPage/Home';
 import CardSection from './components/CardSection/CardSection';
@@ -14,7 +14,10 @@ import EventCreate from './components/EventsCrud/EventCreate';
 import EventUpdate from './components/EventsCrud/EventUpdate';
 import EventDetails from './components/EventsCrud/EventsDetails';
 import EventModal from './components/EventsCrud/EventModal';
-
+import TraitCreate from './components/BehavioralCrud/TraitCreate';
+import QuestionCreate from './components/BehavioralCrud/QuestionCreate';
+import QuestionList from './components/BehavioralCrud/QuestionList';
+import AdminHome from './components/AdminUI/AdminHome';
 
 function App() {
   useEffect(() => {
@@ -38,13 +41,31 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
-        <Route path="/cloud" element={<Cloud />} />
         <Route path="/sentiments" element={<Sentiment />} />
         <Route path="/eventslist" element={<EventList />} />
         <Route path="/eventscreate" element={<EventCreate />} />
         <Route path="/eventsupdate/:id" element={<EventUpdate />} />
         <Route path="/eventsdetails/:id" element={<EventDetails />} />
         <Route path="/eventsmodal/:id" element={<EventModal />} />
+        <Route path="/traitcreate" element={<TraitCreate />} />
+        <Route path="/questioncreate" element={<QuestionCreate />} />
+        <Route path="/questionlist" element={<QuestionList />} />
+
+        {/* Admin Home layout with nested routes */}
+        <Route path="/adminhome" element={<AdminHome />}>
+          {/* Define nested routes inside AdminHome */}
+          <Route path="cloud" element={<Cloud />} />
+          <Route path="admin" element={<CardSection />} />
+          <Route path="eventslist" element={<EventList />} />
+          <Route path="eventscreate" element={<EventCreate />} />
+          <Route path="eventsupdate/:id" element={<EventUpdate />} />
+          <Route path="eventsdetails/:id" element={<EventDetails />} />
+          <Route path="eventsmodal/:id" element={<EventModal />} />
+          <Route path="traitcreate" element={<TraitCreate />} />
+          <Route path="questioncreate" element={<QuestionCreate />} />
+          <Route path="questionlist" element={<QuestionList />} />
+          {/* Add other admin pages if necessary */}
+        </Route>
       </Routes>
     </Router>
   );

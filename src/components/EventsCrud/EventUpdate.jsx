@@ -86,7 +86,7 @@ const EventUpdate = () => {
   if (error) return <div>{error}</div>;
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 py-10">
+    <div className="min-h-screen w-full bg-gray-100 dark:bg-gray-900 py-8 px-4">
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 w-3/4">
         <h2 className="text-2xl font-semibold dark:text-white mb-4">Update Event</h2>
         <form>

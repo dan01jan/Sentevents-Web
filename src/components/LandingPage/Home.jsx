@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import weblogo from '../../assets/website/weblogo.png';
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; 
 
 const Home = () => {
   const [events, setEvents] = useState([]);
@@ -12,7 +11,22 @@ const Home = () => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get('http://localhost:4000/api/v1/events');
-        setEvents(response.data.data); // Set all events
+        const eventsData = response.data.data;
+        
+        // Fetch ratings for each event
+        const eventsWithRatings = await Promise.all(eventsData.map(async (event) => {
+          const ratingsResponse = await axios.get(`http://localhost:4000/api/v1/ratings/${event._id}`);
+          const ratings = ratingsResponse.data; // Assuming it returns an array of ratings
+          
+          // Calculate average rating
+          const averageRating = ratings.length > 0
+            ? ratings.reduce((sum, rating) => sum + rating.score, 0) / ratings.length
+            : 0;
+          
+          return { ...event, averageRating };  // Attach averageRating to the event
+        }));
+
+        setEvents(eventsWithRatings); // Set all events with their calculated average ratings
       } catch (error) {
         console.error('Error fetching events:', error);
       }
@@ -95,9 +109,7 @@ const Home = () => {
 
 const EventCard = ({ event, onClick }) => {
   const imageUrl = event.images?.[0]?.url || event.images?.[0] || "https://via.placeholder.com/150";
-  
-  // Static rating value (use event.rating if available)
-  const staticRating = event.rating || 3; // Example: default to 3 stars if no rating available
+  const averageRating = event.averageRating || 0; // Use the calculated average rating
 
   return (
     <div 
@@ -113,13 +125,13 @@ const EventCard = ({ event, onClick }) => {
       <h3 className="text-2xl font-semibold">{event.name}</h3>
       <p className="mt-2">{event.description}</p>
 
-      {/* Static Star Rating under Description */}
+      {/* Display Average Rating with Stars */}
       <div className="mt-4 flex">
         {[1, 2, 3, 4, 5].map((star) => (
           <svg
             key={star}
             xmlns="http://www.w3.org/2000/svg"
-            fill={star <= staticRating ? "yellow" : "gray"}
+            fill={star <= averageRating ? "yellow" : "gray"}
             viewBox="0 0 24 24"
             stroke="currentColor"
             className="w-6 h-6"

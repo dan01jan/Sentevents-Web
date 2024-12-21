@@ -3,13 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import DarkMode from './DarkMode';
 import axios from 'axios';
 
-const MenuLinks = [
-  { id: 1, name: "Home", link: "/home" },
-  { id: 2, name: "Cloud Words", link: "/cloud" },
-  { id: 3, name: "Blogs", link: "/blogs" },
-  { id: 4, name: "Sentiment", link: "/sentiments" },
-  { id: 5, name: "Events", link: "/eventslist" },
-];
+// const MenuLinks = [
+//   { id: 1, name: "Home", link: "/home" },
+//   { id: 2, name: "Blogs", link: "/blogs" },
+// ];
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -72,9 +69,9 @@ const Navbar = () => {
       <div className="py-4">
         <div className="container flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <Link to="/admin" className="text-primary font-semibold tracking-widest text-2xl uppercase sm:text-3xl">VOYS</Link>
+            <Link to="/home" className="text-primary font-semibold tracking-widest text-2xl uppercase sm:text-3xl">VOYS</Link>
             <div className="hidden lg:block">
-              <ul className="flex items-center gap-4">
+              {/* <ul className="flex items-center gap-4">
                 {MenuLinks.map((data) => (
                   <li key={data.id}>
                     <Link
@@ -85,7 +82,7 @@ const Navbar = () => {
                     </Link>
                   </li>
                 ))}
-              </ul>
+              </ul> */}
             </div>
           </div>
           <div className="flex items-center gap-4">

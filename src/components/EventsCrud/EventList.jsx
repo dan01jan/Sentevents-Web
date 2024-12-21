@@ -56,17 +56,17 @@ const EventList = () => {
 
   const handleEdit = (id) => {
     // Implement edit functionality
-    navigate(`/eventsupdate/${id}`);
+    navigate(`/adminhome/eventsupdate/${id}`);
     console.log(`Edit event with id: ${id}`);
   };
 
-  const handleCreate = () => navigate('/eventscreate');
+  const handleCreate = () => navigate('/adminhome/eventscreate');
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 py-10">
+    <div className="min-h-screen w-full bg-gray-100 dark:bg-gray-900 py-8 px-4">
       <div className="overflow-x-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg mt-4 p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold dark:text-white">Event Data Table</h2>
