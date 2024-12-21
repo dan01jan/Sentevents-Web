@@ -7,46 +7,49 @@ const Login = () => {
     const navigate = useNavigate();
 
     const handleGoogleLogin = async (googleData) => {
-      try {
-          // Send the token ID to your backend to verify
-          const response = await axios.post('http://localhost:4000/api/v1/users/google_login', {
-              tokenId: googleData.tokenId,
-          });
-  
-          // Log the response to see the structure of the data
-          console.log('Google login response:', response.data);
-  
-          // Check if the necessary user data exists in the response
-          if (response.data && response.data.user) {
-              const { user, token } = response.data;
-  
-              // Store user's data in localStorage
-              localStorage.setItem('authToken', token);  // Store the token
-              localStorage.setItem('userName', user.name);  // Store the user's name
-              localStorage.setItem('userEmail', user.email);  // Store the user's email
-              localStorage.setItem('userId', user._id);  // Store the user's ID
-  
-              // Dispatch event for login success
-              window.dispatchEvent(new Event('loginSuccess'));
-  
-              // Navigate based on profile completion status
-              if (response.data.isProfileComplete) {
-                  navigate('/home');
-              } else {
-                  navigate('/updateProfile', { state: { user } });
-              }
-          } else {
-              console.error('Invalid response data:', response.data);
-              alert('Failed to retrieve user data.');
-          }
-      } catch (error) {
-          console.error('Error with Google login:', error);
-          alert('Google login failed');
-      }
-  };
-  
-  
-
+        try {
+            // Send the token ID to your backend to verify
+            const response = await axios.post('http://localhost:4000/api/v1/users/google_login', {
+                tokenId: googleData.tokenId,
+            });
+    
+            // Log the response to see the structure of the data
+            console.log('Google login response:', response.data);
+    
+            // Check if the necessary user data exists in the response
+            if (response.data && response.data.user) {
+                const { user, token } = response.data;
+    
+                // Store user's data in localStorage
+                localStorage.setItem('authToken', token);  // Store the token
+                localStorage.setItem('userName', user.name);  // Store the user's name
+                localStorage.setItem('userEmail', user.email);  // Store the user's email
+                localStorage.setItem('userId', user._id);  // Store the user's ID
+    
+                // Dispatch event for login success
+                window.dispatchEvent(new Event('loginSuccess'));
+    
+                // Check if the profile is complete
+                if (user.isProfileComplete) {
+                    // Redirect based on admin status
+                    if (user.isAdmin) {
+                        navigate('/adminhome');
+                    } else {
+                        navigate('/home');
+                    }
+                } else {
+                    navigate('/updateProfile', { state: { user } });
+                }
+            } else {
+                console.error('Invalid response data:', response.data);
+                alert('Failed to retrieve user data.');
+            }
+        } catch (error) {
+            console.error('Error with Google login:', error);
+            alert('Google login failed');
+        }
+    };
+    
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-6 rounded-md shadow-lg w-full max-w-sm">
