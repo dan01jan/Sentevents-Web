@@ -29,16 +29,21 @@ const Login = () => {
                 // Dispatch event for login success
                 window.dispatchEvent(new Event('loginSuccess'));
     
-                // Check if the profile is complete
-                if (user.isProfileComplete) {
-                    // Redirect based on admin status
-                    if (user.isAdmin) {
-                        navigate('/adminhome');
-                    } else {
-                        navigate('/home');
-                    }
+                // Check if the user is an admin
+                if (user.isAdmin) {
+                    console.log('Admin user, redirecting to /adminhome');
+                    navigate('/adminhome');
                 } else {
-                    navigate('/updateProfile', { state: { user } });
+                    // Check if key profile fields are filled (e.g., name and email)
+                    const isProfileComplete = user.name && user.email && user.course; // Modify this as needed
+    
+                    if (isProfileComplete) {
+                        console.log('Regular user, redirecting to /home');
+                        navigate('/home');
+                    } else {
+                        console.log('Profile incomplete, redirecting to /updateProfile');
+                        navigate('/updateProfile', { state: { user } });
+                    }
                 }
             } else {
                 console.error('Invalid response data:', response.data);
@@ -49,6 +54,7 @@ const Login = () => {
             alert('Google login failed');
         }
     };
+    
     
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
