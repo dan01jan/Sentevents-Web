@@ -57,13 +57,12 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userName');
+    localStorage.clear();  // Clears all items from localStorage
     setIsLoggedIn(false);
     setUserName(null);
     navigate('/login');  // Redirect to login page
   };
-
+  
   return (
     <div className="bg-white dark:bg-gray-900 dark:text-white duration-200 relative z-40">
       <div className="py-4">
