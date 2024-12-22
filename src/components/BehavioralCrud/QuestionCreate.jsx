@@ -4,7 +4,6 @@ import QuestionList from './QuestionList';
 
 const QuestionCreate = () => {
   const [question, setQuestion] = useState('');
-  const [scale, setScale] = useState('');
   const [traits, setTraits] = useState([]);
   const [selectedTrait, setSelectedTrait] = useState('');
   const [message, setMessage] = useState('');
@@ -28,16 +27,18 @@ const QuestionCreate = () => {
     setMessage('');
     setError('');
 
-    if (!question || !scale || !selectedTrait) {
+    if (!question || !selectedTrait) {
       setError('All fields are required');
       return;
     }
 
     try {
+      // Automatically set scale to 1 (or any value between 1-5)
+      const scale = 1; 
+
       const response = await axios.post('http://localhost:4000/api/v1/questions/create-question', { question, scale, traitId: selectedTrait });
       setMessage('Question created successfully');
       setQuestion('');
-      setScale('');
       setSelectedTrait('');
     } catch (err) {
       setError(err.response?.data || 'Error creating question');
@@ -65,23 +66,6 @@ const QuestionCreate = () => {
             onChange={(e) => setQuestion(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
             placeholder="Enter question"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label
-            htmlFor="scale"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Scale
-          </label>
-          <input
-            type="number"
-            id="scale"
-            value={scale}
-            onChange={(e) => setScale(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter scale"
           />
         </div>
 
@@ -118,8 +102,8 @@ const QuestionCreate = () => {
     <div className="mt-10 px-6 py-8 max-w-6xl mx-auto bg-white shadow-xl rounded-lg border border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Questions Overview</h2>
         <QuestionList />
-        </div>
     </div>
+  </div>
   );
 };
 

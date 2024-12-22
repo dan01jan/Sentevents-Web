@@ -40,38 +40,43 @@ const EventsDetails = () => {
   const userId = localStorage.getItem("userId");
   const userName = localStorage.getItem("userName");
 
-  useEffect(() => {
-    const fetchEventDetails = async () => {
-      try {
-        const eventResponse = await axios.get(`http://localhost:4000/api/v1/events/${id}`);
-        setEvent(eventResponse.data.event);
+useEffect(() => {
+  const fetchEventDetails = async () => {
+    try {
+      const eventResponse = await axios.get(`http://localhost:4000/api/v1/events/${id}`);
+      setEvent(eventResponse.data.event);
 
-        const registrationResponse = await axios.get(`http://localhost:4000/api/v1/attendance/check-registration`, {
-          params: { userId, eventId: id },
-        });
-        setIsRegistered(!!registrationResponse.data.isRegistered);
-        setHasAttended(registrationResponse.data.hasAttended || false);
+      const registrationResponse = await axios.get(`http://localhost:4000/api/v1/attendance/check-registration`, {
+        params: { userId, eventId: id },
+      });
+      setIsRegistered(!!registrationResponse.data.isRegistered);
+      setHasAttended(registrationResponse.data.hasAttended || false);
 
-        const ratingsResponse = await axios.get(`http://localhost:4000/api/v1/ratings/${id}`);
-        setRatings(ratingsResponse.data);
+      const ratingsResponse = await axios.get(`http://localhost:4000/api/v1/ratings/${id}`);
+      setRatings(ratingsResponse.data);
 
-        const avgRating = calculateAverageRating(ratingsResponse.data);
-        setAverageRating(avgRating);
+      const eventEndTime = new Date(eventResponse.data.event.dateEnd);
+      const currentTime = new Date();
+      setIsEventEnded(currentTime > eventEndTime);
 
-        const eventEndTime = new Date(eventResponse.data.event.dateEnd);
-        const currentTime = new Date();
-        setIsEventEnded(currentTime > eventEndTime);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching event details:", err);
+      setError("Failed to load event details.");
+      setLoading(false);
+    }
+  };
 
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching event details:", err);
-        setError("Failed to load event details.");
-        setLoading(false);
-      }
-    };
+  fetchEventDetails();
+}, [id, userId]);
 
-    fetchEventDetails();
-  }, [id, userId]);
+useEffect(() => {
+  if (ratings.length > 0) {
+    const avgRating = calculateAverageRating(ratings);
+    setAverageRating(avgRating);
+  }
+}, [ratings]);
+
 
   const handleButtonClick = () => {
     if (isEventEnded) {
