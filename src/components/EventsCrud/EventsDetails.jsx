@@ -1,12 +1,11 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css"; // Core styles
-import "swiper/css/navigation"; // Optional navigation styles
-import "swiper/css/pagination"; // Optional pagination styles
-import EventModal from './EventModal'; // Import the EventModal component
+import "swiper/css"; 
+import "swiper/css/navigation"; 
+import "swiper/css/pagination"; 
+import EventModal from './EventModal'; // Ensure correct import of EventModal
 
 const formatTime = (timeStr) => {
   const date = new Date(timeStr);
@@ -14,9 +13,8 @@ const formatTime = (timeStr) => {
   let minutes = date.getUTCMinutes();
   const ampm = hours >= 12 ? 'pm' : 'am';
 
-  hours = hours % 12;
-  hours = hours ? hours : 12;
-  minutes = minutes < 10 ? '0' + minutes : minutes;
+  hours = hours % 12 || 12;
+  minutes = minutes < 10 ? `0${minutes}` : minutes;
 
   return `${hours}:${minutes}${ampm}`;
 };
@@ -30,16 +28,15 @@ const calculateAverageRating = (ratings) => {
 const EventsDetails = () => {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
-  const [ratings, setRatings] = useState([]);
-  const [averageRating, setAverageRating] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [rating, setRating] = useState(0);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [hasAttended, setHasAttended] = useState(false);
+  const [ratings, setRatings] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
   const [isEventEnded, setIsEventEnded] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [activeSection, setActiveSection] = useState("Comments");
-
-  // Retrieve user info from localStorage
   const userId = localStorage.getItem("userId");
   const userName = localStorage.getItem("userName");
 
@@ -48,6 +45,12 @@ const EventsDetails = () => {
       try {
         const eventResponse = await axios.get(`http://localhost:4000/api/v1/events/${id}`);
         setEvent(eventResponse.data.event);
+
+        const registrationResponse = await axios.get(`http://localhost:4000/api/v1/attendance/check-registration`, {
+          params: { userId, eventId: id },
+        });
+        setIsRegistered(!!registrationResponse.data.isRegistered);
+        setHasAttended(registrationResponse.data.hasAttended || false);
 
         const ratingsResponse = await axios.get(`http://localhost:4000/api/v1/ratings/${id}`);
         setRatings(ratingsResponse.data);
@@ -61,22 +64,20 @@ const EventsDetails = () => {
 
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching event details or ratings:", err);
+        console.error("Error fetching event details:", err);
         setError("Failed to load event details.");
         setLoading(false);
       }
     };
 
     fetchEventDetails();
-  }, [id]);
-
-  const handleRatingChange = (value) => {
-    setRating(value);
-  };
+  }, [id, userId]);
 
   const handleButtonClick = () => {
     if (isEventEnded) {
       setShowModal(true);
+    } else {
+      alert("Event has not ended yet.");
     }
   };
 
@@ -84,25 +85,35 @@ const EventsDetails = () => {
     setShowModal(false);
   };
 
-  if (loading) {
-    return <p>Loading event details...</p>;
-  }
+  const handleRegistration = async () => {
+    try {
+      const response = await axios.post("http://localhost:4000/api/v1/attendance/", {
+        userId,
+        eventId: id,
+      });
+      alert("Registration successful!");
+      setIsRegistered(true);
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("Failed to register. Please try again.");
+    }
+  };
 
-  if (error) {
-    return <p>{error}</p>;
-  }
+  if (loading) return <p>Loading event details...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
         <div className="relative bg-gradient-to-r from-indigo-600 to-blue-500 p-8 rounded-md">
-          <div className="absolute top-0 left-0 w-32 h-32 bg-indigo-500 rounded-full opacity-50"></div>
-          <div className="absolute bottom-0 right-0 w-40 h-40 bg-blue-400 rounded-full opacity-50"></div>
-          
           <Swiper spaceBetween={10} slidesPerView={1} loop={true} className="relative z-10">
-            {event.images.map((image, index) => (
+            {event?.images?.map((image, index) => (
               <SwiperSlide key={index}>
-                <img src={image.url} alt={`Event Image ${index + 1}`} className="w-full h-64 object-cover rounded-lg" />
+                <img
+                  src={image.url}
+                  alt={`Event Image ${index + 1}`}
+                  className="w-full h-64 object-cover rounded-lg"
+                />
               </SwiperSlide>
             ))}
           </Swiper>
@@ -128,16 +139,22 @@ const EventsDetails = () => {
               ))}
             </div>
           </div>
-
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">{event.name}</h2>
-          <p className="text-gray-600 mb-4">{event.description}</p>
-
+          <h2 className="text-2xl font-semibold text-gray-800">{event.name}</h2>
+          <p className="text-gray-600">{event.description}</p>
           <div className="mt-6">
             <h3 className="text-lg font-semibold text-gray-800">Event Details</h3>
             <ul className="list-none text-gray-600 space-y-2">
-              <li><strong>Date:</strong> {event.dateStart.split('T')[0]} to {event.dateEnd.split('T')[0]}</li>
-              <li><strong>Time:</strong> {formatTime(event.dateStart)} to {formatTime(event.dateEnd)}</li>
-              <li><strong>Location:</strong> {event.location}</li>
+              <li>
+                <strong>Date:</strong> {event.dateStart.split("T")[0]} to{" "}
+                {event.dateEnd.split("T")[0]}
+              </li>
+              <li>
+                <strong>Time:</strong> {formatTime(event.dateStart)} to{" "}
+                {formatTime(event.dateEnd)}
+              </li>
+              <li>
+                <strong>Location:</strong> {event.location}
+              </li>
               <li><strong>Brought to you by:</strong> {event.organization}</li>
             </ul>
           </div>
@@ -145,20 +162,33 @@ const EventsDetails = () => {
       </div>
 
       <div className="p-8">
-        <button
-          onClick={handleButtonClick}
-          disabled={!isEventEnded}
-          className={`${isEventEnded ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-400 cursor-not-allowed"} text-white px-6 py-2 rounded-lg transition duration-300`}
-        >
-          Go to Event Modal
-        </button>
+        {isRegistered && hasAttended ? (
+          <button
+            onClick={handleButtonClick}
+            className={`bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition duration-300 ${!isEventEnded && 'opacity-50 cursor-not-allowed'}`}
+            disabled={!isEventEnded}
+          >
+            Go to Event Modal
+          </button>
+        ) : isRegistered ? (
+          <button className="bg-gray-400 text-white px-6 py-2 rounded-lg" disabled>
+            Already Registered
+          </button>
+        ) : (
+          <button
+            onClick={handleRegistration}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition duration-300"
+          >
+            Register for Event
+          </button>
+        )}
       </div>
 
       {showModal && (
         <EventModal
           eventId={id}
           userId={userId}
-          userName={userName} // Pass userName to EventModal
+          userName={userName}
           onClose={closeModal}
         />
       )}

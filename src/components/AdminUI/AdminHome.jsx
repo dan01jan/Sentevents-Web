@@ -44,10 +44,10 @@ const AdminHome = () => {
             </li>
             <li>
               <Link
-                to="#logout"
+                to="/adminhome/attendance"
                 className="block px-4 py-2 rounded-md hover:bg-blue-100 text-gray-700"
               >
-                Logout
+                Attendance
               </Link>
             </li>
           </ul>

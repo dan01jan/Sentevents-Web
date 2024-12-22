@@ -1,21 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Make sure to import axios for API requests
+import React, { useState, useEffect } from "react";
+import axios from "axios"; // Make sure to import axios for API requests
 
 const EventModal = ({ eventId, onClose }) => {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [userId, setUserId] = useState(null);
+  const [event, setEvent] = useState(null); // Store event details
+  const [loading, setLoading] = useState(true); // Loading state for event data
+  const [error, setError] = useState(null); // Error state
 
   // Fetch userId from localStorage when the component mounts
   useEffect(() => {
-    const storedUserId = localStorage.getItem("userId"); // Replace "userId" with the actual key used in localStorage
+    const storedUserId = localStorage.getItem("userId");
     if (storedUserId) {
       setUserId(storedUserId);
     } else {
       console.error("User ID not found in localStorage");
       alert("User not logged in.");
     }
-  }, []);
+
+    const fetchEventDetails = async () => {
+      if (!eventId) {
+        setError("Event ID is missing");
+        return;
+      }
+      try {
+        const response = await axios.get(`http://localhost:4000/api/v1/events/${eventId}`);
+        setEvent(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching event details:", err);
+        setError("Failed to load event details.");
+        setLoading(false);
+      }
+    };
+
+    fetchEventDetails();
+  }, [eventId]);
 
   const handleRatingChange = (value) => {
     setRating(value);
@@ -30,26 +51,47 @@ const EventModal = ({ eventId, onClose }) => {
       alert("User ID is missing");
       return;
     }
-    
+
     try {
-      const response = await axios.post('http://localhost:4000/api/v1/ratings/', {
+      const response = await axios.post("http://localhost:4000/api/v1/ratings/", {
         eventId,
         userId,
         score: rating,
         feedback,
       });
-      console.log('Rating submitted successfully:', response.data);
+      console.log("Rating submitted successfully:", response.data);
       onClose(); // Close the modal after submission
     } catch (error) {
-      console.error('Error submitting rating:', error);
-      alert('There was an error submitting your rating.');
+      console.error("Error submitting rating:", error);
+      alert("There was an error submitting your rating.");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+        <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+          <p>Loading event details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+        <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
         <h2 className="text-xl font-semibold mb-4">Event Feedback</h2>
+        <h3>{event?.name}</h3> {/* Display the event name */}
         
         {/* Star Rating */}
         <div className="flex mb-4">

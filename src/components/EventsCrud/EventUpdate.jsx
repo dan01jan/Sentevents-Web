@@ -63,7 +63,7 @@ const EventUpdate = () => {
       });
 
       alert('Event updated successfully!');
-      navigate('/eventSlist');
+      navigate('/adminhome/eventslist');
     } catch (err) {
       alert('Error updating event');
       console.error(err);

@@ -18,7 +18,7 @@ import TraitCreate from './components/BehavioralCrud/TraitCreate';
 import QuestionCreate from './components/BehavioralCrud/QuestionCreate';
 import QuestionList from './components/BehavioralCrud/QuestionList';
 import AdminHome from './components/AdminUI/AdminHome';
-
+import Attendance from './components/AdminUI/Attendance';
 function App() {
   useEffect(() => {
     function start() {
@@ -60,10 +60,10 @@ function App() {
           <Route path="eventscreate" element={<EventCreate />} />
           <Route path="eventsupdate/:id" element={<EventUpdate />} />
           <Route path="eventsdetails/:id" element={<EventDetails />} />
-          <Route path="eventsmodal/:id" element={<EventModal />} />
           <Route path="traitcreate" element={<TraitCreate />} />
           <Route path="questioncreate" element={<QuestionCreate />} />
           <Route path="questionlist" element={<QuestionList />} />
+          <Route path="attendance" element={<Attendance />} />
           {/* Add other admin pages if necessary */}
         </Route>
       </Routes>
